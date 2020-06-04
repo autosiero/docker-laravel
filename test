@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+TEST_DIR="$SCRIPT_DIR/test-$( date --utc +"%H-%m-%S.%s" )"
+
+mkdir "$TEST_DIR"
+cd "$TEST_DIR"
+
+echo "Symlinking myself as .docker"
+ln -vsr "$SCRIPT_DIR" "$TEST_DIR/.docker"
+
+echo "Creating mock .env files"
+touch "$TEST_DIR/.env"
+touch "$TEST_DIR/.env.example"
+
+echo "Linking script files"
+ln -vsr "$SCRIPT_DIR/docker-compose.yml" "$TEST_DIR/docker-compose.yml"
+ln -vsr "$SCRIPT_DIR/docker-compose.override.yml" "$TEST_DIR/docker-compose.override.yml"
+
+echo "Building from scratch"
+docker-compose --project-directory "$TEST_DIR" \
+    build \
+    --pull \
+    --parallel
+
+echo "Spinning up containers"
+echo "Press CTRL+C to shut them down"
+docker-compose --project-directory "$TEST_DIR" \
+    up \
+    --no-build
+
+
+echo "Cleaning up"
+docker-compose --project-directory "$TEST_DIR" \
+    down \
+    --rmi all \
+    --volumes \
+    --remove-orphans \
+    --timeout 2
+
+cd "$SCRIPT_DIR"
+rm "$TEST_DIR/.docker"
+rm "$TEST_DIR/.env"
+rm "$TEST_DIR/.env.example"
+rm "$TEST_DIR/docker-compose.yml"
+rm "$TEST_DIR/docker-compose.override.yml"
+rmdir "$TEST_DIR"
+
+echo "Done :)"
