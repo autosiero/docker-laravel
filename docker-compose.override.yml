@@ -2,7 +2,16 @@ version: '3.7'
 
 services:
   # Application and webserver
-  php:
+  application:
     ports:
       - 127.0.0.1:8080:80
-      - 127.0.0.1:8081:9000
+
+  # Database
+  database:
+    ports:
+      - 127.0.0.1:8006:3306
+
+  # Cache
+  database:
+    ports:
+      - 127.0.0.1:8079:6379

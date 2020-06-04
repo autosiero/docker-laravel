@@ -1,4 +1,4 @@
-# Docker configurations for Laravel Statamic
+# Docker configurations for Laravel
 
 Easily simulate a dev enviroment for your developers, without being bound by
 platforms (and without using Laravel Homestead or Laravel Valet).
@@ -28,9 +28,9 @@ Packages][token-2]
 
 ## Quick installation
 
-1. Add the project as a submodule to your Statamic project
+1. Add the project as a submodule to your Laravel project
    ```
-   git submodule add https://github.com/autosiero/docker-statamic.git .docker
+   git submodule add https://github.com/autosiero/docker-laravel.git .docker
    ```
 2. Install the `docker-compose.yml` and `docker-compose.override.yml` files
    ```
@@ -41,14 +41,14 @@ Packages][token-2]
    ```
    docker-compose up -d
    ```
-5. Visit your Statamic site
+5. Visit your Laravel site
    https://localhost:8080
 
 ## Regular install
 
-1. Add the project as a submodule to your Statamic project
+1. Add the project as a submodule to your Laravel project
    ```
-   git submodule add https://github.com/autosiero/docker-statamic.git .docker
+   git submodule add https://github.com/autosiero/docker-laravel.git .docker
    ```
 2. Symlink `./docker-compose.yml` in your project to
    `.docker/docker-compose.yml`

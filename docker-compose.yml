@@ -1,50 +1,82 @@
 version: '3.7'
 
 networks:
-  statamic:
+  laravel:
+
+volumes:
+  mysql-data:
 
 # Laravel foundation config
 x-laravel: &laravel-base
+  volumes:
+    - ./:/var/www
   env_file:
-    - .env.example
     - .env
     - .docker/php/docker.env
-  volumes:
-    - ./:/var/www/statamic
-  depends_on:
-    - mail
   networks:
-    - statamic
-
+    - laravel
 
 services:
-  # Application and webserver
-  php:
+  # Main application
+  application:
     << : *laravel-base
-    image: docker.pkg.github.com/autosiero/docker-statamic/laravel-apache
+    image: docker.pkg.github.com/autosiero/docker-laravel/php-apache
     build:
       context: .docker/php
-      target: laravel
+      target: apache
     ports:
       - 127.0.0.1:8080:80
-      - 127.0.0.1:8081:9000
 
-  # Horizon
+  # Job runner
   horizon:
     << : *laravel-base
-    image: docker.pkg.github.com/autosiero/docker-statamic/laravel-horizon
+    image: docker.pkg.github.com/autosiero/docker-laravel/php-horizon
     build:
       context: .docker/php
       target: horizon
 
-  # Mailhog (to test e-mail)
+  # MySQL database
+  database:
+    image: docker.pkg.github.com/autosiero/docker-laravel/database
+    build:
+      context: .docker/mysql
+    volumes:
+      - mysql-data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: laravel
+      MYSQL_ONETIME_PASSWORD: 'true'
+      MYSQL_DATABASE: laravel
+      MYSQL_USER: laravel
+      MYSQL_PASSWORD: laravel
+    ports:
+      - 127.0.0.1:8006:3306
+    networks:
+      - laravel
+
+  # Redis
+  redis:
+    image: redis:alpine
+    networks:
+      - laravel
+    ports:
+      - 127.0.0.1:13379:6379
+
+  # PhpMyAdmin
+  pma:
+    image: docker.pkg.github.com/autosiero/docker-laravel/php-phpmyadmin
+    build:
+      context: .docker/phpmyadmin
+    networks:
+      - laravel
+    environment:
+      PMA_HOST: database
+      PMA_USER: phpmyadmin
+      PMA_PASSWORD: phpmyadmin
+    depends_on:
+      - database
+
+  # Mailhog
   mail:
     image: mailhog/mailhog:latest
     networks:
-      - statamic
-
-  # Redis (cache)
-  redis:
-    image: redis
-    networks:
-      - statamic
+      - laravel
