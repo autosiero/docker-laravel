@@ -12,6 +12,6 @@ services:
       - 127.0.0.1:8006:3306
 
   # Cache
-  database:
+  redis:
     ports:
       - 127.0.0.1:8079:6379
