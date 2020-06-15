@@ -24,8 +24,6 @@ services:
     build:
       context: .docker/php
       target: apache
-    ports:
-      - 127.0.0.1:8080:80
 
   # Job runner
   horizon:
@@ -48,8 +46,6 @@ services:
       MYSQL_DATABASE: laravel
       MYSQL_USER: laravel
       MYSQL_PASSWORD: laravel
-    ports:
-      - 127.0.0.1:8006:3306
     networks:
       - laravel
 
@@ -58,8 +54,6 @@ services:
     image: redis:alpine
     networks:
       - laravel
-    ports:
-      - 127.0.0.1:13379:6379
 
   # PhpMyAdmin
   pma:
